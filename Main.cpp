@@ -20,6 +20,7 @@ using namespace std;
 //just once for text colour
 HANDLE tc = GetStdHandle(STD_OUTPUT_HANDLE);
 
+//Defining all the nodes and ID in an array
 string maze[10][10] =
 {
 { "A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10", "I10", "J10" },
@@ -34,29 +35,34 @@ string maze[10][10] =
 { "A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1", "I1", "J1" },
 };
 
+//Defining all the nodes in chars for printing
 signed char maze_char[10][10] =
 {
-{254,254,254,254,254,254,254,254,254,254},
-{254,79,79,79,79,79,254,254,254,254},
-{254,79,254,254,254,79,79,254,254,254},
-{254,79,79,254,254,79,79,254,254,254},
-{254,254,254,254,254,79,79,254,254,254},
-{79,79,79,79,79,79,79,79,79,254},
-{254,254,254,254,254,254,79,254,254,254},
-{254,254,254,254,254,254,79,254,254,254},
-{254,254,254,254,79,79,79,254,254,254},
-{254,254,254,254,254,254,254,254,254,254},
+{68,68,68,68,68,68,68,68,68,68},
+{68,68,68,68,68,68,68,68,68,68},
+{68,68,68,68,68,68,68,68,68,68},
+{68,68,68,68,68,68,68,68,68,68},
+{68,68,68,68,68,68,68,68,68,68},
+{68,68,68,68,68,68,68,68,68,68},
+{68,68,68,68,68,68,68,68,68,68},
+{68,68,68,68,68,68,68,68,68,68},
+{68,68,68,68,68,68,68,68,68,68},
+{68,68,68,68,68,68,68,68,68,68},
 };
 
-//Create new class for the double linked list
+//Create new class for the linked open list
 class OpenList
 {
 public:
 	string key;
+
+	//Distance is fitness
 	float distance;
-	// Pointer to next node in DLL
+
+	// Pointer to next node in LL
 	OpenList* next;
-	// Pointer to previous node in DLL
+
+	// Pointer to previous node in LL
 	OpenList* previous;
 	string parent;
 
@@ -76,6 +82,7 @@ public:
 	}
 };
 
+//Openlist class
 class OpenLinkedList
 {
 public:
@@ -91,11 +98,11 @@ public:
 	}
 
 	//Check if Node Exists
-
 	OpenList* CheckIfNodeExists(string k)
 	{
 		OpenList* temp = NULL;
 		OpenList* ptr = head;
+
 		//while the doesnt ptr points to a node
 		while (ptr != NULL)
 		{
@@ -108,11 +115,13 @@ public:
 		return temp;
 	}
 
+	//Return parent of a node
 	string ReturnParent(string k)
 	{
 		string temp_string;
 		OpenList* temp = NULL;
 		OpenList* ptr = head;
+
 		//while the doesnt ptr points to a node
 		while (ptr != NULL)
 		{
@@ -182,38 +191,7 @@ public:
 		}
 	}
 
-	//Insert Node after
-	void InsertNodeAfter(string k, OpenList* n) {
-		OpenList* ptr = CheckIfNodeExists(k);
-		if (ptr == NULL) {
-			cout << "No node exists with key value: " << k << endl;
-		}
-		else {
-			if (CheckIfNodeExists(n->key) != NULL) {
-				cout << "Node Already exists with key value : " << n->key << ". Append another node with different Key value" << endl;
-			}
-			else {
-				OpenList* nextNode = ptr->next;
-				// inserting at the end
-				if (nextNode == NULL) {
-					ptr->next = n;
-					n->previous = ptr;
-					cout << "Node Inserted at the END" << endl;
-				}
-
-				//inserting in between
-				else {
-					n->next = nextNode;
-					nextNode->previous = n;
-					n->previous = ptr;
-					ptr->next = n;
-
-					cout << "Node Inserted in Between" << endl;
-				}
-			}
-		}
-	}
-	//Unlink a node
+	//Unlink a node by key value
 	void DeleteNodeByKey(string k)
 	{
 		OpenList* ptr = CheckIfNodeExists(k);
@@ -257,6 +235,7 @@ public:
 		}
 	}
 
+	//Update a node's values by key
 	void UpdateNodeByKey(string k, float d, int q, string na, string t)
 	{
 		OpenList* ptr = CheckIfNodeExists(k);
@@ -272,7 +251,7 @@ public:
 		}
 	}
 
-	//Prints list of items
+	//Prints list, only for debug purposes
 	void PrintList()
 	{
 		if (head == NULL)
@@ -298,7 +277,7 @@ public:
 		}
 	}
 
-	//Search List for smallest f rating
+	//Search List for smallest f rating and return the node with best f
 	string FindSmallestFitness()
 	{
 		float temp_float = 0.0f;
@@ -338,38 +317,9 @@ public:
 			return temp_string;
 		}
 	}
-	//export the list to txt
-	void ExportList(string location)
-	{
-		fstream myFile;
-		if (head == NULL)
-		{
-			cout << "No Nodes in List" << endl;
-		}
-		else
-		{
-			cout << endl << "List Values: ";
-			OpenList* temp = head;
-			//Open the file
-			myFile.open(location, ios::out); //write
-			//Write the first line once
-			myFile << "NAME // parent // PRICE // QUANTITY\n";
-			//Cycle thru each node and print in the coccect format
-			while (temp != NULL)
-			{
-				if (myFile.is_open())
-				{
-					myFile << " // " << temp->parent << " // " << temp->distance << " // " << "\n";
-				}
-				temp = temp->next;
-			}
-			cout << endl;
-		}
-		//close file when done
-		myFile.close();
-	}
 
-	bool CheckIfNIsClosed(string k1)
+	//Check if node is on the open list
+	bool CheckIfNIsOpen(string k1)
 	{
 		bool does_exist;
 		if (head == NULL)
@@ -400,15 +350,16 @@ public:
 	}
 };
 
+//Closed list class
 class ClosedList
 {
 public:
 	string key;
 	float distance;
 	int quantity;
-	// Pointer to next node in DLL
+	// Pointer to next node in LL
 	ClosedList* next;
-	// Pointer to previous node in DLL
+	// Pointer to previous node in LL
 	ClosedList* previous;
 	string name;
 	string parent;
@@ -432,6 +383,7 @@ public:
 	}
 };
 
+//Closed list class
 class ClosedLinkedList
 {
 public:
@@ -447,7 +399,6 @@ public:
 	}
 
 	//Check if Node Exists
-
 	ClosedList* CheckIfNodeExists(string k)
 	{
 		ClosedList* temp = NULL;
@@ -559,6 +510,7 @@ public:
 		}
 	}
 
+	//Update a node's values by key
 	void UpdateNodeByKey(string k, float d, int q, string na, string t)
 	{
 		ClosedList* ptr = CheckIfNodeExists(k);
@@ -573,7 +525,7 @@ public:
 		}
 	}
 
-	//Prints list of items
+	//Prints list, only for debug purposes
 	void PrintList()
 	{
 		if (head == NULL)
@@ -599,7 +551,7 @@ public:
 		}
 	}
 
-	//Prints list of items
+	//Prints The most optimal path and order
 	void PrintOrder(string start_node)
 	{
 		int max_width = 10;
@@ -622,8 +574,6 @@ public:
 				if (count == 0)
 				{
 					path = temp->parent;
-					cout << temp->key << " - ";
-					cout << path << "" << endl;
 					for (int i = 0; i < max_width; i++) {
 						for (int j = 0; j < max_length; j++) {
 							if (path == maze[i][j])
@@ -637,9 +587,7 @@ public:
 				{
 					if (path == temp->key)
 					{
-						cout << temp->key << " - ";
 						path = temp->parent;
-						cout << path << endl;
 						if (path != start_node)
 						{
 							for (int i = 0; i < max_width; i++) {
@@ -664,6 +612,7 @@ public:
 		}
 	}
 
+	//check if node is on the closed list
 	bool CheckIfNIsClosed(string neighbor)
 	{
 		bool does_exist;
@@ -681,7 +630,6 @@ public:
 				if (neighbor == temp->key)
 				{
 					does_exist = 1;
-					cout << "IT EXISTSSSSSSSSSSSSSS";
 					break;
 				}
 				else
@@ -697,22 +645,21 @@ public:
 };
 
 //initalising functions
-void Upper();
-void Lower();
-bool MenuAnswer(string input);
 void PrintMaze();
 void SetStart();
 void SetEnd();
 float CalcDistance(int current_x, int current_y, string neighbor);
 void SetObst();
 
+//initalising varibles
 string start_node;
 string goal_node;
 string current_node;
-
 float f;
 
+//Main start function
 int main(OpenList* node, OpenList* head, OpenList* temp) {
+	//initalising local varibles
 	bool does_exist = 0;
 	float f;
 	int max_width = 10;
@@ -724,13 +671,18 @@ int main(OpenList* node, OpenList* head, OpenList* temp) {
 	int count = 1;
 	string next_node;
 
+	//Calls 3 functions to set the start, end and obstical locations
 	SetStart();
 	SetEnd();
 	SetObst();
+
+	//prints maze for visual appeal
 	PrintMaze();
 
+	//Sets the chosen start node to the current
 	current_node = start_node;
 
+	//Adds the current to openlist
 	count = 0;
 	while (count != 1)
 	{
@@ -739,9 +691,9 @@ int main(OpenList* node, OpenList* head, OpenList* temp) {
 		n1->distance = 0;
 		obj_open.PrependNode(n1);
 		count++;
-		//obj_open.PrintList();
 	}
 
+	//Removes current from openlist
 	count = 0;
 	while (count != 1)
 	{
@@ -751,6 +703,7 @@ int main(OpenList* node, OpenList* head, OpenList* temp) {
 		count++;
 	}
 
+	//Adds current node to closed list
 	count = 0;
 	while (count != 1)
 	{
@@ -760,9 +713,10 @@ int main(OpenList* node, OpenList* head, OpenList* temp) {
 		count++;
 	}
 
+	//While loop starts and runs until the end node is found
 	while (current_node != goal_node)
 	{
-		obj_closed.PrintList();
+		//For loop to get the neighbours then check if they are valid paths then calcualte the fitness of the n
 		for (int i = 0; i < max_width; i++) {
 			for (int j = 0; j < max_length; j++) {
 				if (current_node == maze[i][j])
@@ -773,6 +727,9 @@ int main(OpenList* node, OpenList* head, OpenList* temp) {
 
 					cout << "Getting Neighbours..." << endl;
 
+					//Changing the current x and y of current node from the array to find neighbours
+					//Checks if node is an obstacle or not
+					//Adds valid neighbours to open list with fitness
 					if (current_x == 0 or current_y == 0)
 					{
 					}
@@ -1164,10 +1121,10 @@ int main(OpenList* node, OpenList* head, OpenList* temp) {
 				}
 			}
 		}
+
 		string parent;
 
-		//system("CLS");
-		obj_open.PrintList();
+		system("CLS");
 		k1 = goal_node;
 		does_exist = obj_open.CheckIfNodeExists(k1);
 		cout << does_exist;
@@ -1222,11 +1179,12 @@ int main(OpenList* node, OpenList* head, OpenList* temp) {
 					n2->parent = parent;
 					obj_closed.PrependNode(n2);
 					count++;
-				}
-				//obj_closed.PrintList();
+				};
 			}
 		}
 	}
+
+	//if no possible route
 	if (next_node == "empty")
 	{
 		system("cls");
@@ -1234,55 +1192,24 @@ int main(OpenList* node, OpenList* head, OpenList* temp) {
 	}
 	else
 	{
-		//system("CLS");
+		system("CLS");
 		obj_closed.PrintOrder(start_node);
 		PrintMaze();
 	}
-	obj_closed.PrintList();
 }
 
-bool MenuAnswer(string input) {
-	if ((input.find_first_not_of("0123456789") == string::npos) == true) {//if the input is a number
-		return false;
-	}
-	else {//if input is not a number example 1a, a1, a, 1.1 & @#*
-		system("CLS");
-		Sleep(300);
-		Upper();
-		cout << " The value " << input << " is not a valid integer. Try again. " << endl; //tells user its not a valid int
-		Sleep(300);
-		Lower();
-		return true;
-	}
-}
-
-void Upper()
-{
-	SetConsoleTextAttribute(tc, 2);
-	for (int i = 0; i < 63; i++) {
-		cout << char(205);
-	}
-	cout << endl;
-}
-
-void Lower()
-{
-	cout << endl;
-	for (int i = 0; i < 63; i++) {
-		cout << char(205);
-	}
-	SetConsoleTextAttribute(tc, 15);
-	cout << endl;
-}
-
+//Prints Maze in chars
 void PrintMaze()
 {
 	char square = 254;
 	bool is_there = false;
 	cout << endl;
+
 	//setting the max size of length and height
 	const int m = 10, n = 10;
 	int start_num = 11;
+
+	//goes thru each node and prints it in the correct colour
 	for (int i = 0; i < m; i++) {
 		start_num--;
 		if (start_num == 10)
@@ -1297,24 +1224,28 @@ void PrintMaze()
 			is_there = false;
 			if (maze[i][j] != start_node and maze[i][j] != goal_node)
 			{
+				//Obstacle
 				if (maze_char[i][j] == 79)
 				{
 					SetConsoleTextAttribute(tc, 4);
 					cout << square << " ";
 					SetConsoleTextAttribute(tc, 7);
 				}
+				//Final Path
 				else if (maze_char[i][j] == 61)
 				{
 					SetConsoleTextAttribute(tc, 2);
 					cout << square << " ";
 					SetConsoleTextAttribute(tc, 7);
 				}
+				//Explored nodes
 				else if (maze_char[i][j] == 88)
 				{
 					SetConsoleTextAttribute(tc, 6);
 					cout << square << " ";
 					SetConsoleTextAttribute(tc, 7);
 				}
+				//blank - not affect nodes
 				else
 				{
 					SetConsoleTextAttribute(tc, 7);
@@ -1322,12 +1253,14 @@ void PrintMaze()
 					SetConsoleTextAttribute(tc, 7);
 				}
 			}
+			//start node
 			else if (maze[i][j] == start_node)
 			{
 				SetConsoleTextAttribute(tc, 3);
 				cout << square << " ";
 				SetConsoleTextAttribute(tc, 7);
 			}
+			//end node
 			else if (maze[i][j] == goal_node)
 			{
 				SetConsoleTextAttribute(tc, 3);
@@ -1340,6 +1273,7 @@ void PrintMaze()
 	cout << "   A B C D E F G H I J" << endl;
 }
 
+//Choose your start location
 void SetStart()
 {
 	int m = 10;
@@ -1374,6 +1308,7 @@ void SetStart()
 	start_node = start;
 }
 
+//Choose your end location
 void SetEnd()
 {
 	int m = 10;
@@ -1408,6 +1343,7 @@ void SetEnd()
 	goal_node = end;
 }
 
+//toggle obsticals by node
 void SetObst()
 {
 	int m = 10;
@@ -1451,6 +1387,7 @@ void SetObst()
 	}
 }
 
+//Calculates the fitness
 float CalcDistance(int current_x, int current_y, string neighbor)
 {
 	//Calculate f for n, where f = g + h
@@ -1474,7 +1411,6 @@ float CalcDistance(int current_x, int current_y, string neighbor)
 	int neighbor_y;
 
 	//Find the x,y coords of the goal
-
 	int m = 10;
 	int n = 10;
 	for (int i = 0; i < m; i++) {
@@ -1531,7 +1467,6 @@ float CalcDistance(int current_x, int current_y, string neighbor)
 
 	//If statement for y and x that sorts the x and y so that negitives dont occure
 	//Distance from (current node to neibhour n) + (current g distance from start to current)
-
 	if (start_x < current_x)
 	{
 		temp1 = current_x - start_x;
@@ -1558,6 +1493,6 @@ float CalcDistance(int current_x, int current_y, string neighbor)
 
 	//Calculate f for n, where f = g + h
 	f = g + h;
-	//cout << "Fitness of " << maze[current_x][current_y] << " is: " << f << endl;
+
 	return f;
 }
